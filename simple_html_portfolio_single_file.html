@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Portfolio – Simple Demo</title>
+  <style>
+    :root {
+      --bg: #f7f7fb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --accent: #4f46e5;
+      --border: #e5e7eb;
+    }
+    .dark {
+      --bg: #0b1020;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --card: #101935;
+      --accent: #60a5fa;
+      --border: #1f2a44;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Layout */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(10px);
+      background: color-mix(in oklab, var(--bg) 70%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: .8rem 0; }
+    .brand { font-weight: 800; letter-spacing: .3px; }
+    .nav-links a {
+      text-decoration: none; color: var(--muted); margin-left: 1rem; font-weight: 600;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .hero { padding: 3rem 0 2rem; display: grid; gap: 1rem; grid-template-columns: 1.2fr .8fr; align-items: center; }
+    .hero h1 { font-size: clamp(1.8rem, 3vw, 2.6rem); margin: 0 0 .5rem; }
+    .hero p { color: var(--muted); margin: 0 0 1rem; }
+    .hero .cta { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .btn {
+      appearance: none; border: 1px solid var(--border); background: var(--card); color: var(--text);
+      padding: .6rem .9rem; border-radius: .75rem; cursor: pointer; font-weight: 700;
+    }
+    .btn.primary { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1rem; }
+    .grid { display: grid; gap: 1rem; }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+    h2 { margin: 2rem 0 1rem; font-size: 1.4rem; }
+    .tag { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: .2rem .6rem; font-size: .8rem; color: var(--muted); margin-right: .4rem; }
+
+    /* Project list */
+    .project { display: flex; flex-direction: column; gap: .4rem; }
+    .project h3 { margin: 0; font-size: 1.05rem; }
+    .project p { margin: 0; color: var(--muted); }
+    .project a { color: var(--accent); text-decoration: none; font-weight: 600; }
+
+    /* Add Project form */
+    form { display: grid; gap: .6rem; }
+    input, textarea, select {
+      padding: .6rem .7rem; border-radius: .6rem; border: 1px solid var(--border); background: var(--card); color: var(--text);
+    }
+    label { font-size: .9rem; color: var(--muted); }
+
+    footer { margin: 2rem 0; padding: 1rem 0; color: var(--muted); border-top: 1px solid var(--border); font-size: .9rem; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="brand">My Portfolio</div>
+        <div class="nav-links">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+          <button id="themeToggle" class="btn" title="Toggle theme">🌓</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>Hi, I'm <span id="nameSpan">Your Name</span> 👋</h1>
+        <p>A simple, single‑file <strong>Digital Portfolio Platform</strong> demo. Edit text, add projects, and share your work.</p>
+        <div class="cta">
+          <button class="btn primary" onclick="downloadJSON()">Download JSON</button>
+          <button class="btn" onclick="loadSample()">Load Sample Data</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Quick Profile</h3>
+        <label>Display Name</label>
+        <input id="nameInput" placeholder="Enter your name" />
+        <label>Headline</label>
+        <input id="headlineInput" placeholder="e.g., Frontend Developer" />
+        <label>Tags</label>
+        <input id="tagsInput" placeholder="e.g., React, UX, APIs" />
+      </div>
+    </section>
+
+    <section id="about">
+      <h2>About</h2>
+      <div class="card">
+        <textarea id="aboutInput" rows="4" placeholder="Write a short bio..."></textarea>
+      </div>
+    </section>
+
+    <section id="skills">
+      <h2>Skills</h2>
+      <div id="skillsWrap" class="card"></div>
+      <div class="card" style="margin-top:.8rem">
+        <form id="skillForm">
+          <div class="grid cols-2">
+            <div>
+              <label>Skill</label>
+              <input id="skillName" placeholder="e.g., JavaScript" />
+            </div>
+            <div>
+              <label>Level</label>
+              <select id="skillLevel">
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+                <option>Expert</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn primary" type="submit">Add Skill</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2>Projects</h2>
+      <div id="projectList" class="grid cols-3"></div>
+      <div class="card" style="margin-top:.8rem">
+        <form id="projectForm">
+          <div class="grid cols-2">
+            <div>
+              <label>Title</label>
+              <input id="projectTitle" placeholder="Project title" />
+            </div>
+            <div>
+              <label>Link</label>
+              <input id="projectLink" placeholder="https://..." />
+            </div>
+          </div>
+          <label>Description</label>
+          <textarea id="projectDesc" rows="3" placeholder="What does it do?"></textarea>
+          <button class="btn primary" type="submit">Add Project</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <div class="grid cols-2">
+        <div class="card">
+          <p>Email: <a id="emailLink" href="mailto:you@example.com">you@example.com</a></p>
+          <p>LinkedIn: <a id="linkedinLink" href="#">Add link</a></p>
+          <p>GitHub: <a id="githubLink" href="#">Add link</a></p>
+        </div>
+        <div class="card">
+          <form id="contactForm" onsubmit="event.preventDefault(); alert('Demo only: message not sent');">
+            <label>Your Email</label>
+            <input id="contactEmail" type="email" placeholder="name@example.com" required />
+            <label>Message</label>
+            <textarea id="contactMsg" rows="3" placeholder="Hello!"></textarea>
+            <button class="btn primary" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Built as a simple HTML/CSS/JS demo. No backend required.
+    </footer>
+  </main>
+
+  <script>
+    // Data model stored in localStorage
+    const KEY = 'portfolio_data_v1';
+    const $ = (s) => document.querySelector(s);
+
+    const state = {
+      name: 'Your Name',
+      headline: '',
+      tags: [],
+      about: '',
+      skills: [],
+      projects: [],
+      links: { email: 'you@example.com', linkedin: '', github: '' }
+    };
+
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      render();
+    }
+
+    function load() {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      try { Object.assign(state, JSON.parse(raw)); } catch {}
+      render();
+    }
+
+    function loadSample() {
+      Object.assign(state, {
+        name: 'Santhosh S',
+        headline: 'Frontend Developer & Designer',
+        tags: ['React', 'UI/UX', 'API Integration'],
+        about: 'I build clean, fast, and accessible web interfaces. I enjoy turning problems into elegant, user‑friendly experiences.',
+        skills: [
+          { name: 'HTML/CSS', level: 'Expert' },
+          { name: 'JavaScript', level: 'Advanced' },
+          { name: 'React', level: 'Advanced' }
+        ],
+        projects: [
+          { title: 'Portfolio Builder', desc: 'Drag‑and‑drop editor to create personal sites.', link: '#' },
+          { title: 'Image Gallery', desc: 'Responsive gallery with lazy loading.', link: '#' },
+          { title: 'Analytics Widget', desc: 'Mini dashboard for visits & clicks.', link: '#' }
+        ],
+        links: { email: 'you@example.com', linkedin: 'https://linkedin.com/', github: 'https://github.com/' }
+      });
+      save();
+    }
+
+    function render() {
+      // Header + hero
+      $('#nameSpan').textContent = state.name || 'Your Name';
+
+      // Bind inputs
+      $('#nameInput').value = state.name;
+      $('#headlineInput').value = state.headline || '';
+      $('#tagsInput').value = state.tags.join(', ');
+      $('#aboutInput').value = state.about || '';
+      $('#emailLink').textContent = state.links.email;
+      $('#emailLink').href = `mailto:${state.links.email}`;
+      $('#linkedinLink').href = state.links.linkedin || '#';
+      $('#githubLink').href = state.links.github || '#';
+
+      // Skills
+      const skillsWrap = $('#skillsWrap');
+      skillsWrap.innerHTML = '';
+      if (state.headline) {
+        const p = document.createElement('p');
+        p.className = 'muted';
+        p.textContent = state.headline;
+        skillsWrap.appendChild(p);
+      }
+      const tagsLine = document.createElement('div');
+      state.tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = t;
+        tagsLine.appendChild(span);
+      });
+      skillsWrap.appendChild(tagsLine);
+
+      // Project cards
+      const list = $('#projectList');
+      list.innerHTML = '';
+      state.projects.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'card project';
+        const h3 = document.createElement('h3');
+        h3.textContent = p.title;
+        const d = document.createElement('p');
+        d.textContent = p.desc;
+        const a = document.createElement('a');
+        a.href = p.link || '#';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = 'View project →';
+        const del = document.createElement('button');
+        del.className = 'btn';
+        del.style.marginTop = '.4rem';
+        del.textContent = 'Remove';
+        del.onclick = () => { state.projects.splice(i, 1); save(); };
+        card.append(h3, d, a, del);
+        list.appendChild(card);
+      });
+    }
+
+    // Form handlers
+    $('#skillForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = $('#skillName').value.trim();
+      const level = $('#skillLevel').value;
+      if (!name) return;
+      state.skills.push({ name, level });
+      if (!state.tags.includes(name)) state.tags.push(name);
+      $('#skillName').value = '';
+      save();
+    });
+
+    $('#projectForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = $('#projectTitle').value.trim();
+      const desc = $('#projectDesc').value.trim();
+      const link = $('#projectLink').value.trim();
+      if (!title) return;
+      state.projects.push({ title, desc, link });
+      $('#projectTitle').value = '';
+      $('#projectDesc').value = '';
+      $('#projectLink').value = '';
+      save();
+    });
+
+    // Input bindings
+    $('#nameInput').addEventListener('input', (e) => { state.name = e.target.value; save(); });
+    $('#headlineInput').addEventListener('input', (e) => { state.headline = e.target.value; save(); });
+    $('#tagsInput').addEventListener('change', (e) => {
+      state.tags = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+      save();
+    });
+    $('#aboutInput').addEventListener('input', (e) => { state.about = e.target.value; save(); });
+
+    // Theme toggle
+    const themeBtn = document.getElementById('themeToggle');
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    function initTheme() {
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    }
+
+    // Export JSON
+    function downloadJSON() {
+      const data = JSON.stringify(state, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'portfolio-data.json'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Init
+    initTheme();
+    load();
+    render();
+  </script>
+</body>
+</html>
